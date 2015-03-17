@@ -37,10 +37,14 @@
     <h2>Persistence</h2>
     <ul class="list-group col-xs-4">
         {{#each getMembers}}
-            <li class="list-group-item"><span contenteditable="true" data-update="true" style="width:90%">{{firstname}}</span><button type="button" class="btn btn-danger btn-xs pull-right"><span class="glyphicon glyphicon-minus"></span></button></li>
+            <li class="list-group-item"><span contenteditable="true" data-update="true" style="width:90%">{{firstname}}</span>
+                <button type="button" class="btn btn-danger btn-xs pull-right">
+                    <span class="glyphicon glyphicon-minus"></span>
+                </button>
+            </li>
         {{/each}}
-        <li class="list-group-item"><div contenteditable="true" data-insert="true" class="list-group-item-success"
-            style="color:grey;">Ajouter un nouveau</div>
+        <li class="list-group-item">
+            <span contenteditable="true" data-insert="true" class="list-group-item-success" style="color:grey;">Ajouter un nouveau</span>
         </li>
     </ul>
 </template>

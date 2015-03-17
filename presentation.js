@@ -58,7 +58,7 @@ if (Meteor.isClient) {
   });
 
   Template.persistence.events({
-    'keypress ul li div[contenteditable="true"]': function (event) {
+    'keypress ul li span[contenteditable="true"]': function (event) {
       // prevent line break when return key is used
       if (event.charCode == 13) {
         event.preventDefault();
@@ -67,15 +67,15 @@ if (Meteor.isClient) {
     },
 
     'click ul li button': function (event) {
-	Members.remove({_id: this._id});
+	  Members.remove({_id: this._id});
     },
 
-    'focus ul li div[data-insert="true"]': function (event) {
-      event.currentTarget.innerHTML = "";
+    'focus ul li span[data-insert="true"]': function (event) {
+      event.currentTarget.innerHTML = "&nbsp;"; // just to keep the height of the li contenteditable ... Bad
     },
 
-    'blur ul li div[data-insert="true"]': function (event) {
-      var firstname = event.currentTarget.innerText || event.currentTarget.innerHTML;
+    'blur ul li span[data-insert="true"]': function (event) {
+      var firstname = event.currentTarget.innerText.trim() || event.currentTarget.innerHTML.trim();
 
       if (firstname.length) {
         Members.insert({firstname: firstname});
@@ -84,7 +84,7 @@ if (Meteor.isClient) {
       event.currentTarget.innerHTML = "Ajouter un nouveau";
     },
 
-    'blur ul li div[data-update="true"]': function (event) {
+    'blur ul li span[data-update="true"]': function (event) {
       var firstname = event.currentTarget.innerText || event.currentTarget.innerHTML;
 
       Members.update({_id: this._id}, {$set: {firstname: firstname}});
@@ -92,27 +92,47 @@ if (Meteor.isClient) {
   });
 
   Template.persistence.rendered = function () {
-    this.find('li div')._uihooks = {
+    console.log("rendered");
+    el = this;
+
+    this.find('ul')._uihooks = {
       insertElement: function (node, next) {
+console.log('insert');
         var offScreenClass = 'list-group-item-info',
             jNode = $(node);
 
-        jNode
+        jNode.hide()
             .addClass(offScreenClass)
-            .insertBefore(next);
+            .insertBefore(next)
+            .fadeIn();
 
-        jNode.offset();
-
-        Meteor.setTimeout(function() {
+        setTimeout(function() {
           jNode.removeClass(offScreenClass);
         }, 2000);
       },
 
       moveElement: function (node, next) {
+        var offScreenClass = 'list-group-item-warning',
+            jNode = $(node);
 
+        jNode.addClass(offScreenClass);
+
+        setTimeout(function() {
+          jNode.removeClass(offScreenClass);
+        }, 2000);
       },
 
       removeElement: function(node) {
+console.log('remove');
+        var offScreenClass = 'list-group-item-warning',
+            jNode = $(node);
+
+        jNode.addClass(offScreenClass);
+
+        setTimeout(function() {
+          jNode.fadeOut()
+              .remove();
+        }, 2000);
 
       }
     }
