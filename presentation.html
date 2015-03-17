@@ -1,0 +1,46 @@
+<template name="ApplicationLayout">
+    <h1>Welcome to next tutorial from Meteor-Lyon!</h1>
+
+    {{> yield "menu"}}
+
+    {{> yield}}
+</template>
+
+<template name="navbar">
+    <ul class="nav nav-tabs">
+        {{# each navBars}}
+            <li role="presentation" class="{{active}}"><a href="{{url}}">{{label}}</a></li>
+        {{/each}}
+    </ul>
+</template>
+
+<template name="increment">
+    <h2>Increment</h2>
+    <div class="panel panel-default">
+      <div class="panel-heading"><button class="btn btn-default">Ajoute +1</button></div>
+      <div class="panel-body">
+        <div class="col-xs-4 well well-sm">{{counter}} click</div>
+        <div class="col-xs-1"> </div>
+        <div class="col-xs-4 well well-sm">CrazyClick : <span style="color:#{{getColor}}">{{counter}} times</span>.</div>
+      </div>
+    </div>
+    <footer class="col-xs-12 ">Footer of your {{counter}} click</footer>
+</template>
+
+<template name="rpc">
+    <h2>RPC</h2>
+    <button class="btn btn-default">Test Methods</button>
+    <div id="rpc-result"></div>
+</template>
+
+<template name="persistence">
+    <h2>Persistence</h2>
+    <ul class="list-group col-xs-4">
+        {{#each getMembers}}
+            <li class="list-group-item"><span contenteditable="true" data-update="true" style="width:90%">{{firstname}}</span><button type="button" class="btn btn-danger btn-xs pull-right"><span class="glyphicon glyphicon-minus"></span></button></li>
+        {{/each}}
+        <li class="list-group-item"><div contenteditable="true" data-insert="true" class="list-group-item-success"
+            style="color:grey;">Ajouter un nouveau</div>
+        </li>
+    </ul>
+</template>
