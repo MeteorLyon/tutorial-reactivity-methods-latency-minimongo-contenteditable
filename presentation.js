@@ -1,168 +1,159 @@
 Members = new Meteor.Collection('medialabs-members');
 
 if (Meteor.isClient) {
-  // counter starts at 0
-  Session.setDefault('counter', 0);
+    // counter starts at 0
+    Session.setDefault('counter', 0);
 
-  Template.navbar.helpers({
-    "navBars": function() {
-      return NavBars.find();
-    },
-    "active": function() {
-      return Router.current().location.get().path == this.url ? "active" : "";
-    }
-  });
+    Template.navbar.helpers({
+        "navBars": function () {
+            return NavBars.find();
+        },
+        "active": function () {
+            return Router.current().location.get().path == this.url ? "active" : "";
+        }
+    });
 
-  Template.increment.helpers({
-    counter: function () {
-      return Session.get('counter');
-    },
-    getColor: function() {
-      var hexColor = parseInt(Session.get('counter')).toString(16);
+    Template.increment.helpers({
+        counter: function () {
+            return Session.get('counter');
+        },
+        getColor: function () {
+            var hexColor = parseInt(Session.get('counter')).toString(16);
 
-      return String('00FF00' + hexColor).slice(-6);
-    }
-  });
+            return String('00FF00' + hexColor).slice(-6);
+        }
+    });
 
-  Template.increment.events({
-    'click button': function () {
-      // increment the counter when button is clicked
-      Session.set('counter', Session.get('counter') + 1);
-    }
-  });
+    Template.increment.events({
+        'click button': function () {
+            // increment the counter when button is clicked
+            Session.set('counter', Session.get('counter') + 1);
+        }
+    });
 
-  Template.rpc.myCb = function (error, results) {
-    var container = $("#rpc-result"),
-        display;
+    Template.rpc.myCb = function (error, results) {
+        var container = $("#rpc-result"),
+            display;
 
-    if (!container.length) {
-      return;
-    }
+        if (!container.length) {
+            return;
+        }
 
-    container.empty();
+        container.empty();
 
-    display = JSON.stringify(results);
-    container.append(display);
-  };
+        display = JSON.stringify(results);
+        container.append(display);
+    };
 
-  Template.rpc.events({
-    'click button': function() {
-      Meteor.call('ping', 1, Template.rpc.myCb);
-    }
-  });
+    Template.rpc.events({
+        'click button': function () {
+            Meteor.call('ping', 1, Template.rpc.myCb);
+        }
+    });
 
-  Template.persistence.helpers({
-    getMembers: function() {
-      return Members.find();
-    }
-  });
+    Template.persistence.helpers({
+        getMembers: function () {
+            return Members.find();
+        }
+    });
 
-  Template.persistence.events({
-    'keypress ul li span[contenteditable="true"]': function (event) {
-      // prevent line break when return key is used
-      if (event.charCode == 13) {
-        event.preventDefault();
-        event.currentTarget.blur();
-      }
-    },
+    Template.persistence.events({
+        'keypress ul li span[contenteditable="true"]': function (event) {
+            // prevent line break when return key is used
+            if (event.charCode == 13) {
+                event.preventDefault();
+                event.currentTarget.blur();
+            }
+        },
 
-    'click ul li button': function (event) {
-	  Members.remove({_id: this._id});
-    },
+        'click ul li button': function (event) {
+            Members.remove({_id: this._id});
+        },
 
-    'focus ul li span[data-insert="true"]': function (event) {
-      event.currentTarget.innerHTML = "&nbsp;"; // just to keep the height of the li contenteditable ... Bad
-    },
+        'blur ul li span[data-insert="true"]': function (event) {
+            var firstname = event.currentTarget.innerText.trim() || event.currentTarget.innerHTML.trim();
 
-    'blur ul li span[data-insert="true"]': function (event) {
-      var firstname = event.currentTarget.innerText.trim() || event.currentTarget.innerHTML.trim();
+            if (firstname.length) {
+                Members.insert({firstname: firstname});
+            }
 
-      if (firstname.length) {
-        Members.insert({firstname: firstname});
-      }
+            event.currentTarget.innerHTML = "";
+        },
 
-      event.currentTarget.innerHTML = "Ajouter un nouveau";
-    },
+        'blur ul li span[data-update="true"]': function (event) {
+            var firstname = event.currentTarget.innerText || event.currentTarget.innerHTML;
 
-    'blur ul li span[data-update="true"]': function (event) {
-      var firstname = event.currentTarget.innerText || event.currentTarget.innerHTML;
+            Members.update({_id: this._id}, {$set: {firstname: firstname}});
+        }
+    });
 
-      Members.update({_id: this._id}, {$set: {firstname: firstname}});
-    }
-  });
+    var membersUiHooks = {
+        insertElement: function (node, next) {
+            var offScreenClass = 'list-group-item-info',
+                jNode = $(node);
 
-  Template.persistence.rendered = function () {
-    console.log("rendered");
-    el = this;
+            jNode.hide()
+                .addClass(offScreenClass)
+                .insertBefore(next)
+                .fadeIn();
 
-    this.find('ul')._uihooks = {
-      insertElement: function (node, next) {
-console.log('insert');
-        var offScreenClass = 'list-group-item-info',
-            jNode = $(node);
+            setTimeout(function () {
+                jNode.removeClass(offScreenClass);
+            }, 2000);
+        },
 
-        jNode.hide()
-            .addClass(offScreenClass)
-            .insertBefore(next)
-            .fadeIn();
+        moveElement: function (node, next) {
+            var offScreenClass = 'list-group-item-warning',
+                jNode = $(node);
 
-        setTimeout(function() {
-          jNode.removeClass(offScreenClass);
-        }, 2000);
-      },
+            jNode.addClass(offScreenClass);
 
-      moveElement: function (node, next) {
-        var offScreenClass = 'list-group-item-warning',
-            jNode = $(node);
+            setTimeout(function () {
+                jNode.removeClass(offScreenClass);
+            }, 2000);
+        },
 
-        jNode.addClass(offScreenClass);
+        removeElement: function (node) {
+            var offScreenClass = 'list-group-item-warning',
+                jNode = $(node);
 
-        setTimeout(function() {
-          jNode.removeClass(offScreenClass);
-        }, 2000);
-      },
+            jNode.addClass(offScreenClass);
 
-      removeElement: function(node) {
-console.log('remove');
-        var offScreenClass = 'list-group-item-warning',
-            jNode = $(node);
+            setTimeout(function () {
+                jNode.fadeOut()
+                    .remove();
+            }, 2000);
 
-        jNode.addClass(offScreenClass);
+        }
+    };
 
-        setTimeout(function() {
-          jNode.fadeOut()
-              .remove();
-        }, 2000);
-
-      }
-    }
-  }
+    Template.persistence.rendered = function () {
+        this.find('ul')._uihooks = membersUiHooks;
+    };
 }
 
-Meteor.startup(function () {
-  Meteor.methods({
+Meteor.methods({
     "ping": function (params) {
-      var platform = {
-          "server": Meteor.isServer,
-          "client": Meteor.isClient
-      },
-          result = {result: "pong", params: arguments, platform: platform, simulation: this.isSimulation};
+        var platform = {
+                "server": Meteor.isServer,
+                "client": Meteor.isClient
+            },
+            result = {result: "pong", params: arguments, platform: platform, simulation: this.isSimulation};
 
-      if (this.isSimulation) {
-        // on client display resutl
-        Template.rpc.myCb(null, result);
-      } else {
-        // on server simulate latency to allow display on client of simulated results
-        Meteor._sleepForMs(3000);
-      }
+        if (this.isSimulation) {
+            // on client display result
+            Template.rpc.myCb(null, result);
+        } else {
+            // on server simulate latency to allow display on client of simulated results
+            Meteor._sleepForMs(3000);
+        }
 
-      return result;
+        return result;
     }
-  });
 });
 
 if (Meteor.isServer) {
-  Meteor.startup(function () {
+    Meteor.startup(function () {
 // code to run on server at startup
-  });
+    });
 }
