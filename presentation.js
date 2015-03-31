@@ -52,8 +52,15 @@ if (Meteor.isClient) {
     });
 
     Template.persistence.helpers({
-        getMembers: function () {
+        getMembers: function() {
             return Members.find();
+        },
+
+        getNew: function() {
+            var cursor = MembersCounter.find(),
+                count = cursor.count() ? _.first(cursor.fetch())['count'] : 0;
+
+            return count;
         }
     });
 
@@ -66,6 +73,10 @@ if (Meteor.isClient) {
             }
         },
 
+        'click button#see-new': function (event) {
+            Session.set('date', new Date());
+        },
+
         'click ul li button': function (event) {
             Members.remove({_id: this._id});
         },
@@ -74,7 +85,8 @@ if (Meteor.isClient) {
             var firstname = event.currentTarget.innerText.trim() || event.currentTarget.innerHTML.trim();
 
             if (firstname.length) {
-                Members.insert({firstname: firstname});
+                // add ownerId to prevent inserted item to be removed because of date Session value
+                Members.insert({firstname: firstname, date: new Date(), ownerId: Meteor.userId()});
             }
 
             event.currentTarget.innerHTML = "";
@@ -88,7 +100,7 @@ if (Meteor.isClient) {
     });
 
     var membersUiHooks = {
-        insertElement: function (node, next) {
+        "insertElement": function (node, next) {
             var offScreenClass = 'list-group-item-info',
                 jNode = $(node);
 
@@ -102,7 +114,7 @@ if (Meteor.isClient) {
             }, 2000);
         },
 
-        moveElement: function (node, next) {
+        "moveElement": function (node, next) {
             var offScreenClass = 'list-group-item-warning',
                 jNode = $(node);
 
@@ -113,7 +125,7 @@ if (Meteor.isClient) {
             }, 2000);
         },
 
-        removeElement: function (node) {
+        "removeElement": function (node) {
             var offScreenClass = 'list-group-item-warning',
                 jNode = $(node);
 
@@ -127,9 +139,20 @@ if (Meteor.isClient) {
         }
     };
 
-    Template.persistence.rendered = function () {
+    MembersCounter = new Meteor.Collection('newMembersSinceLastView'); // seems important to set the physical name as the same as the subscribtion
+    Template.persistence.created = function () { // onCrated doesn't work
+        var self = this;
+
+        this.autorun(function() {
+            self.subscribe("members", Session.get('date'));
+            self.subscribe("newMembersSinceLastView", Session.get('date'));
+        });
+    };
+
+    Template.persistence.rendered = function () { // onRendered doesn't work
         this.find('ul')._uihooks = membersUiHooks;
     };
+
 }
 
 Meteor.methods({
@@ -154,6 +177,48 @@ Meteor.methods({
 
 if (Meteor.isServer) {
     Meteor.startup(function () {
-// code to run on server at startup
+        // remove previous guests
+        Accounts.removeOldGuests();
+
+        Meteor.publish("members", function(date) {
+            return Members.find({$or: [
+                {date: {$lt: date}},
+                {ownerId: this.userId}
+            ]}, {$sort: {date: 0}});
+        });
+
+        // nouveau pckage : guest+accounts+mongol/jetsetter... ?
+        // https://github.com/eventedmind/meteor-observe-in-a-publish-function/blob/master/server/server.js
+        Meteor.publish("newMembersSinceLastView", function(date) {
+            var subscription = this,
+                docId = Meteor.uuid(),
+                userId = this.userId,
+                observerHandle,
+                cursorMember = Members.find({$and: [
+                    {date: {$gt: date}},
+                    {ownerId: {$ne: userId}}
+                ]}),
+
+                count = cursorMember.count();
+
+            // reset counter
+            subscription.added("newMembersSinceLastView", docId, {count: 0, ownerId: userId});
+
+            // observe
+            observerHandle = cursorMember.observe({
+                "added": function(document) {
+                    count++;
+                    subscription.changed('newMembersSinceLastView', docId, {count: count}); // use changed, not added, because you are not on the same colection in fact !!!
+
+                    console.log('added / changed', count, userId);
+                }
+            });
+
+            subscription.onStop(function () {
+                observerHandle.stop();
+            });
+
+            subscription.ready();
+        });
     });
 }

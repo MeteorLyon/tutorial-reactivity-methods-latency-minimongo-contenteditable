@@ -7,6 +7,7 @@ var goToHome = goToIncrement = function () {
         this.render('navbar', {"to": "menu"});
     },
     goToPersistence = function() {
+        Session.set('date', new Date()); // for counter reset and display new items
         this.render('persistence');
         this.render('navbar', {"to": "menu"});
     },
