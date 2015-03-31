@@ -1,3 +1,4 @@
+
 Members = new Meteor.Collection('medialabs-members');
 
 if (Meteor.isClient) {
@@ -31,8 +32,8 @@ if (Meteor.isClient) {
     }
   });
 
-  Template.rpc.myCb = function (error, results) {
-    var container = $("#rpc-result"),
+  Template.onDemand.myCb = function (error, results) {
+    var container = $("#onDemand-result"),
         display;
 
     if (!container.length) {
@@ -45,9 +46,9 @@ if (Meteor.isClient) {
     container.append(display);
   };
 
-  Template.rpc.events({
+  Template.onDemand.events({
     'click button': function() {
-      Meteor.call('ping', 1, Template.rpc.myCb);
+      Meteor.call('ping', 1, Template.onDemand.myCb);
     }
   });
 
@@ -103,7 +104,7 @@ Meteor.startup(function () {
 
       if (this.isSimulation) {
         // on client display resutl
-        Template.rpc.myCb(null, result);
+        Template.onDemand.myCb(null, result);
       } else {
         // on server simulate latency to allow display on client of simulated results
         Meteor._sleepForMs(3000);
