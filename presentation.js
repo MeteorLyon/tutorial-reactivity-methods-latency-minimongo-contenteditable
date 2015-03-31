@@ -90,53 +90,6 @@ if (Meteor.isClient) {
       Members.update({_id: this._id}, {$set: {firstname: firstname}});
     }
   });
-
-  Template.persistence.rendered = function () {
-    console.log("rendered");
-    el = this;
-
-    this.find('ul')._uihooks = {
-      insertElement: function (node, next) {
-console.log('insert');
-        var offScreenClass = 'list-group-item-info',
-            jNode = $(node);
-
-        jNode.hide()
-            .addClass(offScreenClass)
-            .insertBefore(next)
-            .fadeIn();
-
-        setTimeout(function() {
-          jNode.removeClass(offScreenClass);
-        }, 2000);
-      },
-
-      moveElement: function (node, next) {
-        var offScreenClass = 'list-group-item-warning',
-            jNode = $(node);
-
-        jNode.addClass(offScreenClass);
-
-        setTimeout(function() {
-          jNode.removeClass(offScreenClass);
-        }, 2000);
-      },
-
-      removeElement: function(node) {
-console.log('remove');
-        var offScreenClass = 'list-group-item-warning',
-            jNode = $(node);
-
-        jNode.addClass(offScreenClass);
-
-        setTimeout(function() {
-          jNode.fadeOut()
-              .remove();
-        }, 2000);
-
-      }
-    }
-  }
 }
 
 Meteor.startup(function () {
