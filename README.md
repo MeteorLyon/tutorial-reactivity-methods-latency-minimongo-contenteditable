@@ -28,3 +28,16 @@ When you use Collection, your client will subscribe to data published by your se
 Minimongo allow you to acces Collection and manipulate them directly on client side, and in the same way you would do on server. 
 Here ther is a Members Collection, and you can add and modify what you want using HTML li[contenteditable]
 
+## Some other concepts ##
+
+# ergonomy #
+
+ - #1 animations when items are modified in realtime
+ - #2 counter to display number of new items arrived since last update
+
+# on road to components #
+
+ - Template subcription
+ - Still misses data store inside Template
+ - Still misses state inside Template instead of Session
+
