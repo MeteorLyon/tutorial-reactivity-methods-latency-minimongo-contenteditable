@@ -2,8 +2,8 @@ var goToHome = goToIncrement = function () {
         this.render('increment');
         this.render('navbar', {"to": "menu"});
     },
-    goToRpc = function () {
-        this.render('rpc');
+    goToOnDemand = function () {
+        this.render('onDemand');
         this.render('navbar', {"to": "menu"});
     },
     goToPersistence = function() {
@@ -12,15 +12,14 @@ var goToHome = goToIncrement = function () {
     },
     routes = [
         {"url": "/increment", "label": "Increment", "controller": goToIncrement},
-        {"url": "/rpc", "label": "RPC", "controller": goToRpc},
+        {"url": "/onDemand", "label": "On Demand", "controller": goToOnDemand},
         {"url": "/persistence", "label": "Persistence", "controller": goToPersistence}
     ];
 
 NavBars = new Meteor.Collection(null);
 
 Router.configure({
-    layoutTemplate: 'ApplicationLayout',
-
+    layoutTemplate: 'ApplicationLayout'
 });
 
 Router.route("", goToHome);
