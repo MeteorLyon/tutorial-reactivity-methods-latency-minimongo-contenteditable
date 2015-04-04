@@ -53,7 +53,7 @@ if (Meteor.isClient) {
 
     Template.persistence.helpers({
         getMembers: function() {
-            return Members.find();
+            return Members.find({}, {sort: {date: 0}});
         },
 
         getNew: function() {
@@ -183,7 +183,7 @@ if (Meteor.isServer) {
             return Members.find({$or: [
                 {date: {$lt: date}},
                 {ownerId: this.userId}
-            ]}, {$sort: {date: 0}});
+            ]}, {sort: {date: 0}});
         });
 
         // nouveau pckage : guest+accounts+mongol/jetsetter... ?
