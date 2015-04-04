@@ -54,7 +54,7 @@ if (Meteor.isClient) {
 
     Template.persistence.helpers({
         getMembers: function () {
-            return Members.find();
+            return Members.find({}, {sort: {date: 0}});
         }
     });
 
