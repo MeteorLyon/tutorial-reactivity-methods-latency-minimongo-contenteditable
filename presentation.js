@@ -43,6 +43,10 @@ if (Meteor.isClient) {
 
         display = JSON.stringify(results);
         container.append(display);
+
+        $(container).each(function(i, block) {
+            hljs.highlightBlock(block);
+        });
     };
 
     Template.onDemand.events({
@@ -160,7 +164,12 @@ Meteor.methods({
                 "server": Meteor.isServer,
                 "client": Meteor.isClient
             },
-            result = {result: "pong", params: arguments, platform: platform, simulation: this.isSimulation};
+            result = {
+		result: "pong", 
+		params: arguments, 
+		platform: platform, 
+		simulation: this.isSimulation
+	    };
 
         if (this.isSimulation) {
             // on client display result
