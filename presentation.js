@@ -41,10 +41,11 @@ if (Meteor.isClient) {
 
         container.empty();
 
-        display = JSON.stringify(results);
+        display = JSON.stringify(results, undefined, 4); // add 4 spaces
         container.append(display);
 
         $(container).each(function(i, block) {
+            hljs.configure({"tabReplace": true, "useBr": true}); // ask for indent
             hljs.highlightBlock(block);
         });
     };
@@ -166,7 +167,7 @@ Meteor.methods({
             },
             result = {
 		result: "pong", 
-		params: arguments, 
+		params: params, 
 		platform: platform, 
 		simulation: this.isSimulation
 	    };
