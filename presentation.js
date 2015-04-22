@@ -41,8 +41,13 @@ if (Meteor.isClient) {
 
         container.empty();
 
-        display = JSON.stringify(results);
+        display = JSON.stringify(results, undefined, 4); // add 4 spaces
         container.append(display);
+
+        $(container).each(function(i, block) {
+            hljs.configure({"tabReplace": true, "useBr": true}); // ask for indent
+            hljs.highlightBlock(block);
+        });
     };
 
     Template.onDemand.events({
@@ -160,7 +165,12 @@ Meteor.methods({
                 "server": Meteor.isServer,
                 "client": Meteor.isClient
             },
-            result = {result: "pong", params: arguments, platform: platform, simulation: this.isSimulation};
+            result = {
+		result: "pong", 
+		params: params, 
+		platform: platform, 
+		simulation: this.isSimulation
+	    };
 
         if (this.isSimulation) {
             // on client display result
