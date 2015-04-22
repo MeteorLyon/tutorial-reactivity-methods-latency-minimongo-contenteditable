@@ -42,8 +42,13 @@ if (Meteor.isClient) {
 
         container.empty();
 
-        display = JSON.stringify(results);
+        display = JSON.stringify(results, undefined, 4); // add 4 spaces
         container.append(display);
+
+        $(container).each(function(i, block) {
+            hljs.configure({"tabReplace": true, "useBr": true}); // ask for indent
+            hljs.highlightBlock(block);
+        });
     };
 
     Template.onDemand.events({
@@ -61,7 +66,7 @@ if (Meteor.isClient) {
     Template.persistence.events({
         'keypress ul li span[contenteditable="true"]': function (event) {
             // prevent line break when return key is used
-            if (event.charCode == 13) {
+            if (event.which === 13) {
                 event.preventDefault();
                 event.currentTarget.blur();
             }
@@ -72,7 +77,7 @@ if (Meteor.isClient) {
         },
 
         'blur ul li span[data-insert="true"]': function (event) {
-            var firstname = event.currentTarget.innerText.trim() || event.currentTarget.innerHTML.trim();
+            var firstname = (event.currentTarget.innerText || event.currentTarget.innerHTML).trim();
 
             if (firstname.length) {
                 Members.insert({firstname: firstname});
@@ -89,7 +94,7 @@ if (Meteor.isClient) {
     });
 
     var membersUiHooks = {
-        insertElement: function (node, next) {
+        "insertElement": function (node, next) {
             var offScreenClass = 'list-group-item-info',
                 jNode = $(node);
 
@@ -103,7 +108,7 @@ if (Meteor.isClient) {
             }, 2000);
         },
 
-        moveElement: function (node, next) {
+        "moveElement": function (node, next) {
             var offScreenClass = 'list-group-item-warning',
                 jNode = $(node);
 
@@ -114,7 +119,7 @@ if (Meteor.isClient) {
             }, 2000);
         },
 
-        removeElement: function (node) {
+        "removeElement": function (node) {
             var offScreenClass = 'list-group-item-warning',
                 jNode = $(node);
 
@@ -139,7 +144,12 @@ Meteor.methods({
                 "server": Meteor.isServer,
                 "client": Meteor.isClient
             },
-            result = {result: "pong", params: arguments, platform: platform, simulation: this.isSimulation};
+            result = {
+		result: "pong", 
+		params: params, 
+		platform: platform, 
+		simulation: this.isSimulation
+	    };
 
         if (this.isSimulation) {
             // on client display result

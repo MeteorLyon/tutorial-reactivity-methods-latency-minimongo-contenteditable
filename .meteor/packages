@@ -5,9 +5,14 @@
 # but you can also edit it by hand.
 
 meteor-platform
-autopublish
 insecure
+underscore
 twbs:bootstrap
 iron:router
-underscore
-simple:highlight.js
+
+msavin:mongol
+msavin:jetsetter
+
+accounts-base
+accounts-password
+artwells:accounts-guest
