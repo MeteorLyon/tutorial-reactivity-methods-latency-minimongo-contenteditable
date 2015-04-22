@@ -34,6 +34,7 @@
 </template>
 
 <template name="persistence">
+    <h2>Persistence {{#if getNew}}<button class="btn btn-success" type="button" title="view {{getNew}} news" id="see-new">new <span class="badge">{{getNew}}</span></button>{{/if}}</h2>
     <h2>Persistence</h2>
     <ul class="list-group col-xs-4">
         {{#each getMembers}}
