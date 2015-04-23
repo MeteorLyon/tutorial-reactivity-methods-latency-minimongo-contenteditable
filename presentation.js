@@ -1,4 +1,3 @@
-
 Members = new Meteor.Collection('medialabs-members');
 
 if (Meteor.isClient) {
@@ -59,9 +58,9 @@ if (Meteor.isClient) {
 
     Template.persistence.helpers({
         getMembers: function() {
-            return Members.find({}, {sort: {date: 0}});
-    }
-  });
+            return Members.find({}, {sort: {date: -1}});
+        }
+    });
 
     Template.persistence.events({
         'keypress ul li span[contenteditable="true"]': function (event) {
@@ -72,20 +71,21 @@ if (Meteor.isClient) {
             }
         },
 
-    'click ul li button': function (event) {
-	  Members.remove({_id: this._id});
-    },
+        'click ul li button': function (event) {
+          Members.remove({_id: this._id});
+        },
 
-    'focus ul li span[data-insert="true"]': function (event) {
-      event.currentTarget.innerHTML = "&nbsp;"; // just to keep the height of the li contenteditable ... Bad
-    },
+        'focus ul li span[data-insert="true"]': function (event) {
+          event.currentTarget.innerHTML = "&nbsp;"; // just to keep the height of the li contenteditable ... Bad
+        },
 
         'blur ul li span[data-insert="true"]': function (event) {
             var firstname = (event.currentTarget.innerText || event.currentTarget.innerHTML).trim();
-
-      if (firstname.length) {
-        Members.insert({firstname: firstname});
-      }
+console.log(firstname);
+            if (firstname.length) {
+            console.info('inside');
+                Members.insert({firstname: firstname});
+            }
 
             event.currentTarget.innerHTML = "";
         },
