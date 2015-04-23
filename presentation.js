@@ -1,4 +1,3 @@
-
 Members = new Meteor.Collection('medialabs-members');
 
 if (Meteor.isClient) {
@@ -59,7 +58,7 @@ if (Meteor.isClient) {
 
     Template.persistence.helpers({
         getMembers: function () {
-            return Members.find({}, {sort: {date: 0}});
+            return Members.find({}, {sort: {date: -1}});
         }
     });
 

@@ -6,6 +6,7 @@
 
 meteor-platform
 insecure
+autopublish
 underscore
 twbs:bootstrap
 iron:router
